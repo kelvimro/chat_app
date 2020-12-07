@@ -116,6 +116,7 @@ class _LobbyViewState extends State<LobbyView> {
     searchTextEditingController.clear();
   }
 
+  //*LogOut User
   Future<Null> logoutUser() async {
     await FirebaseAuth.instance.signOut();
     await googleSignIn.disconnect();

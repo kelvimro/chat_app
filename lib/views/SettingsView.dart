@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tc_chat_room/main.dart';
+import 'package:tc_chat_room/widgets/progress_widget.dart';
 
 class SettingsView extends StatelessWidget {
   @override
@@ -33,6 +37,8 @@ class _SettingsViewState extends State<_SettingsView> {
   String aboutMe = "";
   File photoFile;
   bool isLoading = false;
+  final FocusNode nicknameFocusNode = FocusNode();
+  final FocusNode aboutMeFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -141,12 +147,95 @@ class _SettingsViewState extends State<_SettingsView> {
                       ],
                     ),
                   ),
-                ), //*Image Profile and
+                ), //*Image Profile end
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(1.0),
+                      child: isLoading ? circularProgress() : Container(),
+                    ),
+                    //*Nickname
+                    Container(
+                      padding: EdgeInsets.only(right: 30.0, left: 30.0),
+                      child: Theme(
+                        data: Theme.of(context),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: "Enter your Nickname",
+                            labelText: "Nickname",
+                            contentPadding: EdgeInsets.all(5.0),
+                          ),
+                          controller: nicknameTextEditingController,
+                          onChanged: (value) {
+                            nickname = value;
+                          },
+                          focusNode: nicknameFocusNode,
+                        ),
+                      ),
+                    ), //*Nickname end
+                    //*About Me
+                    Container(
+                      padding: EdgeInsets.only(right: 30.0, left: 30.0),
+                      child: Theme(
+                        data: Theme.of(context),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: "Tell about you.",
+                            labelText: "About Me",
+                            contentPadding: EdgeInsets.all(5.0),
+                          ),
+                          controller: aboutMeTextEditingController,
+                          onChanged: (value) {
+                            aboutMe = value;
+                          },
+                          focusNode: aboutMeFocusNode,
+                        ),
+                      ),
+                    ), //*About me end
+                  ],
+                ), //*TextFields column
+                //*Buttons
+                Container(
+                  child: FlatButton(
+                    onPressed: () {},
+                    child: Text("Update"),
+                    color: Colors.orangeAccent,
+                    highlightColor: Colors.red,
+                    splashColor: Colors.transparent,
+                    padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                  ),
+                  margin: EdgeInsets.only(top: 30.0, bottom: 5.0),
+                ),
+                //*Logout Button
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: 50.0,
+                    right: 50.0,
+                  ),
+                  child: RaisedButton(
+                    onPressed: logoutUser,
+                    child: Text("Logout"),
+                    color: Colors.deepOrange,
+                  ),
+                ),
               ],
             ),
           )
         ],
       ),
     );
+  }
+
+  //*LogOut User
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+  Future<Null> logoutUser() async {
+    await FirebaseAuth.instance.signOut();
+    await googleSignIn.disconnect();
+    await googleSignIn.signOut();
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false);
   }
 }
