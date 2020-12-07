@@ -59,6 +59,7 @@ class _SettingsViewState extends State<_SettingsView> {
 
     nicknameTextEditingController = TextEditingController(text: nickname);
     aboutMeTextEditingController = TextEditingController(text: aboutMe);
+
     setState(() {
       isLoading = false;
     });
